@@ -17,6 +17,12 @@ public class Constants {
     public static final String ATTENDANCE_STATUS = "attendanceStatus";
     public static final String KEY_ATTENDANCE_STATUS = "keyAttendanceStatus";
 
+    public static final String LOGIN_STATUS = "loginStatus";
+    public static final String KEY_LOGIN_STATUS = "keyLoginStatus";
+
+    public static final int STATUS_ON = 1;
+    public static final int STATUS_OFF = 0;
+
 
 
 }

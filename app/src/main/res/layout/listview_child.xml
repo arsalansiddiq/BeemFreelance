@@ -2,6 +2,7 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/linearLayout_listItems"
     android:orientation="vertical">
 
     <LinearLayout
@@ -94,18 +95,22 @@
             android:layout_weight="1">
 
             <EditText
+                android:id="@+id/edtText_loose"
                 android:layout_height="wrap_content"
                 android:layout_width="100dp"
                 android:layout_gravity="left"
                 android:layout_weight="1"
+                android:inputType="number"
                 android:gravity="center"
                 android:textSize="20sp" />
 
             <EditText
+                android:id="@+id/edtText_carton"
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
                 android:gravity="center"
+                android:inputType="number"
                 android:layout_weight="1"
                 android:textSize="20sp" />
         </LinearLayout>

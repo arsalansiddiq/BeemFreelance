@@ -28,6 +28,16 @@ public class CustomListAdapter extends ArrayAdapter<SalesSKUArrayResponse> {
         this.salesSKUArrayResponse =  objects;
     }
 
+    @Override
+    public int getViewTypeCount() {
+        return super.getViewTypeCount();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return super.getItemViewType(position);
+    }
+
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
@@ -39,7 +49,6 @@ public class CustomListAdapter extends ArrayAdapter<SalesSKUArrayResponse> {
         }
 //        return super.getView(position, convertView, parent);
 
-
         TextView txtView_name = convertView.findViewById(R.id.txtView_name);
         TextView txtView_brandImage = convertView.findViewById(R.id.txtView_brandImage);
 
@@ -48,8 +57,9 @@ public class CustomListAdapter extends ArrayAdapter<SalesSKUArrayResponse> {
 
         return convertView;
 
-
     }
+
+
 
 
 }

@@ -13,13 +13,17 @@ import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -31,6 +35,7 @@ import com.example.arsalansiddiq.beem.databases.BeemDatabase;
 import com.example.arsalansiddiq.beem.databases.BeemPreferences;
 import com.example.arsalansiddiq.beem.interfaces.LoginInterface;
 import com.example.arsalansiddiq.beem.interfaces.SKUCategoryInterface;
+import com.example.arsalansiddiq.beem.models.UserSelectedItems;
 import com.example.arsalansiddiq.beem.models.requestmodels.LoginRequest;
 import com.example.arsalansiddiq.beem.models.responsemodels.LoginResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.salesresponsemodels.SalesObjectResponse;
@@ -38,27 +43,37 @@ import com.example.arsalansiddiq.beem.models.responsemodels.salesresponsemodels.
 import com.example.arsalansiddiq.beem.utils.Constants;
 import com.example.arsalansiddiq.beem.utils.NetworkUtils;
 
+import org.w3c.dom.Text;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Response;
 
 public class OrderActivity extends AppCompatActivity implements LocationListener {
 
-    private Spinner spinner_saleStatus;
-    private Button btn_submit;
-    private NetworkUtils networkUtils;
-    String cusName; Long contact; String email; String gender; String age; String cBrand;
-    String pBrand; Integer saleStatus; Integer empId; String empName; String designation; String city;
-    Integer location;
-    private LocationManager locationManager;
+    private Spinner spinner_saleStatus = null;
+    private NetworkUtils networkUtils = null;
+    String cusName; Long contact; String email; String gender; String age; String cBrand = null;
+    String pBrand = null;
+    Integer saleStatus = null;
+    private LocationManager locationManager = null;
     private float latitude, longitude;
-    private BeemDatabase beemDatabase;
+    private BeemDatabase beemDatabase = null;
 
-    private ListView listView_order;
+    private ListView listView_order = null;
+    private Intent intent = null;
+    private FrameLayout frameLayout_noProducts = null;
+    private View view = null;
+    private EditText edtText_loose = null;
+    private EditText edtText_carton = null;
+    private TextView txtView_name = null;
 
-    private Intent intent;
+    private float totalAmount = 0;
 
-    private FrameLayout frameLayout_noProducts;
+    private List<SalesSKUArrayResponse> salesSKUArrayResponseArrayList = null;
+
+    private Response<SalesObjectResponse> salesObjectResponse = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,9 +83,14 @@ public class OrderActivity extends AppCompatActivity implements LocationListener
         beemDatabase = new BeemDatabase(this);
         beemDatabase.getReadableDatabase();
 
+        //view = new View(this);
+//        linearLayout_listItems = findViewById(R.id.linearLayout_listItems);
+
         spinner_saleStatus = findViewById(R.id.spinner_saleStatus);
-        btn_submit = findViewById(R.id.btn_submit);
         listView_order = findViewById(R.id.listView_order);
+        listView_order.setDescendantFocusability(ViewGroup.FOCUS_AFTER_DESCENDANTS);
+        listView_order.setItemsCanFocus(true);
+//        edtText_loose = (EditText) view.findViewById(R.id.edtText_loose);
 
         frameLayout_noProducts = findViewById(R.id.frameLayout_noProducts);
 
@@ -82,7 +102,6 @@ public class OrderActivity extends AppCompatActivity implements LocationListener
         age = intent.getStringExtra("age");
         pBrand = intent.getStringExtra("pBrand");
         cBrand = intent.getStringExtra("cBrand");
-
 
         ArrayAdapter adapterGender = ArrayAdapter.createFromResource(this, R.array.saleStatus_array, android.R.layout.simple_spinner_item);
         adapterGender.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -103,18 +122,22 @@ public class OrderActivity extends AppCompatActivity implements LocationListener
 
         frameLayout_noProducts.setVisibility(View.GONE);
         getBrandItems();
-    }
 
+
+    }
 
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void onSubmit(View view) {
+
         networkUtils = new NetworkUtils(OrderActivity.this);
 
         getLocation();
 
         if (spinner_saleStatus.getSelectedItemPosition() == 0) {
+
             Toast.makeText(OrderActivity.this, "Please Select Sale Status", Toast.LENGTH_SHORT).show();
+
         } else {
 
             SharedPreferences preferences = this.getSharedPreferences(Constants.BA_ATTENDANCE_ID, MODE_PRIVATE);
@@ -138,12 +161,20 @@ public class OrderActivity extends AppCompatActivity implements LocationListener
                                     @Override
                                     public void success(Response<LoginResponse> loginResponse) {
 
-                                        final BeemPreferences beemPreferences = new BeemPreferences(OrderActivity.this);
-                                        beemPreferences.initialize_and_createPreferences_forStatus(loginResponse.body().getStatus());
-                                        intent = new Intent(OrderActivity.this, SalesActivity.class);
-                                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                        startActivity(intent);
-                                        Log.i("sale Statuss", String.valueOf(loginResponse.body().getStatus()));
+                                        if (loginResponse.body().getStatus() == 1) {
+
+
+                                            getSelectedItemAndPrice();
+
+//                                            final BeemPreferences beemPreferences = new BeemPreferences(OrderActivity.this);
+//                                            beemPreferences.initialize_and_createPreferences_forStatus(loginResponse.body().getStatus());
+//                                            intent = new Intent(OrderActivity.this, SalesActivity.class);
+//                                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                                            startActivity(intent);
+//                                            Log.i("sale Statuss", String.valueOf(loginResponse.body().getStatus()));
+
+                                        }
+
                                     }
 
                                     @Override
@@ -221,9 +252,9 @@ public class OrderActivity extends AppCompatActivity implements LocationListener
                 public void success(Response<SalesObjectResponse> response) {
                     if (response.body().getStatus() == 1) {
 
-                       List<SalesSKUArrayResponse> salesSKUArrayResponseArrayList = response.body().getSku();
-                        CustomListAdapter adapter = new CustomListAdapter(OrderActivity.this, 0, salesSKUArrayResponseArrayList);
-                        listView_order.setAdapter(adapter);
+                       salesSKUArrayResponseArrayList = response.body().getSku();
+                       CustomListAdapter adapter = new CustomListAdapter(OrderActivity.this, 0, salesSKUArrayResponseArrayList);
+                       listView_order.setAdapter(adapter);
 
                     } else {
                         Toast.makeText(OrderActivity.this, "Something Went Wrong", Toast.LENGTH_SHORT).show();
@@ -242,6 +273,74 @@ public class OrderActivity extends AppCompatActivity implements LocationListener
                 }
             });
         }
+
+    }
+
+
+    void getSelectedItemAndPrice() {
+
+        int listLength = listView_order.getChildCount();
+        String[] valueOfEditText = new String[listLength];
+
+        for (int i = 0; i < listLength; i++) {
+
+            view = listView_order.getChildAt(i);
+
+            txtView_name = (TextView) view.findViewById(R.id.txtView_name);
+
+            edtText_loose = (EditText) view.findViewById(R.id.edtText_loose);
+            edtText_carton = (EditText) view.findViewById(R.id.edtText_carton);
+
+            if (TextUtils.isEmpty(edtText_loose.getText().toString()) && TextUtils.isEmpty(edtText_carton.getText().toString())) {
+
+            } else if (edtText_loose.getText().toString() == "0" && edtText_carton.getText().toString() == "0") {
+            } else if (edtText_loose.getText().toString().length() > 0 && edtText_carton.getText().toString() == "" ||
+                    edtText_loose.getText().toString() == "" && edtText_carton.getText().length() > 0) {
+                valueOfEditText[i] = "" + i;
+            }
+
+        }
+
+//        if (TextUtils.isEmpty(edtText_loose.getText().toString()) && TextUtils.isEmpty(edtText_carton.getText().toString())) {
+//
+//            Log.i("quantityEmpty", "empty");
+//            Toast.makeText(this, "please enter quantity", Toast.LENGTH_SHORT).show();
+//
+//        } else {
+//
+//            if (edtText_loose.getText().toString() == "0" && edtText_carton.getText().toString() == "0") {
+//                Toast.makeText(this, "Please Enter Quantity", Toast.LENGTH_SHORT).show();
+//            } else if (edtText_loose.getText().toString().length() > 0 && edtText_carton.getText().toString() == "") {
+//                loose = Integer.parseInt(edtText_loose.getText().toString());
+//                getCalculatedValues(i, loose, 0);
+//            } else if (edtText_loose.getText().toString() == "" && edtText_carton.getText().toString().length() > 0) {
+//                carton = Integer.parseInt(edtText_carton.getText().toString());
+//                getCalculatedValues(i, 0, carton);
+//            } else if (edtText_loose.getText().toString() == "" && edtText_carton.getText().toString() == "") {
+//                Toast.makeText(this, "Please Enter Quantity", Toast.LENGTH_SHORT).show();
+//            } else if (edtText_loose.getText().toString().length() > 0 && edtText_carton.getText().toString().length() > 0) {
+//                Toast.makeText(this, "Please One Category Loose or Carton", Toast.LENGTH_SHORT).show();
+//            }
+//        }
+
+//            Log.i("detLoose", valueOfEditText[i]);
+
+    }
+
+    private void getCalculatedValues(int i, int loose, int carton) {
+
+
+        SalesSKUArrayResponse salesSKUArrayResponse = salesSKUArrayResponseArrayList.get(i);
+
+        //int price = salesSKUArrayResponse.getPrice();
+
+        float pricePerItem = (salesSKUArrayResponse.getPrice() / salesSKUArrayResponse.getItemPerCarton());
+
+        int items = 0;
+        items = carton * 10;
+        items += loose;
+
+        totalAmount += pricePerItem * items;
 
     }
 

@@ -13,9 +13,11 @@ import android.widget.Toast;
 
 import com.example.arsalansiddiq.beem.R;
 import com.example.arsalansiddiq.beem.databases.BeemDatabase;
+import com.example.arsalansiddiq.beem.databases.BeemPreferences;
 import com.example.arsalansiddiq.beem.interfaces.LoginInterface;
 import com.example.arsalansiddiq.beem.models.requestmodels.LoginRequest;
 import com.example.arsalansiddiq.beem.models.responsemodels.LoginResponse;
+import com.example.arsalansiddiq.beem.utils.Constants;
 import com.example.arsalansiddiq.beem.utils.NetworkUtils;
 
 import retrofit2.Response;
@@ -28,6 +30,7 @@ public class LoginActivity extends AppCompatActivity {
     private Button btn_login;
     private Intent intent;
     private BeemDatabase beemDatabase;
+    private BeemPreferences beemPreferences;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -37,6 +40,7 @@ public class LoginActivity extends AppCompatActivity {
 
         beemDatabase = new BeemDatabase(this);
         beemDatabase.getWritableDatabase();
+        beemPreferences = new BeemPreferences(this);
 
 
         networkUtils = new NetworkUtils(LoginActivity.this);
@@ -64,6 +68,9 @@ public class LoginActivity extends AppCompatActivity {
                             @Override
                             public void success(Response<LoginResponse> loginResponse) {
                                 if (loginResponse.body().getStatus() == 1) {
+
+                                    beemPreferences.initialize_and_createPreferences_forLoginSession(Constants.STATUS_ON);
+
                                     if (beemDatabase.checkUserExist(loginResponse.body().getUserId())) {
                                         intent = new Intent(LoginActivity.this, NavigationDrawerActivity.class);
                                         startActivity(intent);

@@ -36,4 +36,10 @@ public class BeemPreferences {
         sharedPreEditor.apply();
     }
 
+    public void initialize_and_createPreferences_forLoginSession (int loginStatus) {
+        sharedPreEditor = context.getSharedPreferences(Constants.LOGIN_STATUS, MODE_PRIVATE).edit();
+        sharedPreEditor.putInt(Constants.KEY_LOGIN_STATUS, loginStatus);
+        sharedPreEditor.apply();
+    }
+
 }

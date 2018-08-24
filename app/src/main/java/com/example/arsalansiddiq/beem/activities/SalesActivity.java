@@ -28,22 +28,24 @@ import retrofit2.Response;
 public class SalesActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
 //    private List<String> skuCategoryList;
-    private SalesSKUArrayResponse skuCategory;
+    private SalesSKUArrayResponse skuCategory = null;
 
-    private TextView txtView_recordsSent_count;
+    private TextView txtView_recordsSent_count = null;
 
-    private String[] brandList;
+    private String[] brandList = null;
 
-    private Spinner spinner_gender, spinner_age, spinner_pBrand, spinner_cBrand;
+    private Spinner spinner_gender, spinner_age, spinner_pBrand, spinner_cBrand = null;
 
-    String name, email, gender, age, cBrand, pBrand; Integer saleStatus; Integer empId; String empName; String designation;
+    String name, email, gender, age, cBrand, pBrand = null;
 
-    Long contact;
+    Long contact = null;
 
     private EditText edtText_name, edtText_contact, edtText_email;
 
     private ArrayAdapter<CharSequence> adapterGender, adapterAge, adapterBrand;
     private Button btn_next;
+
+    private Response<SalesObjectResponse> salesObjectResponse = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +92,8 @@ public class SalesActivity extends AppCompatActivity implements AdapterView.OnIt
                 public void success(Response<SalesObjectResponse> response) {
                     if (response.body().getStatus() == 1) {
 
+                        salesObjectResponse = response;
+
                         brandList = new String[response.body().getSku().size() + 1];
                         brandList[0] = "Select Brand";
 
@@ -134,7 +138,6 @@ public class SalesActivity extends AppCompatActivity implements AdapterView.OnIt
 
     public void onNext(View v) {
 
-
         name = edtText_name.getText().toString();
 
         if (TextUtils.isEmpty(edtText_contact.getText())){
@@ -162,7 +165,6 @@ public class SalesActivity extends AppCompatActivity implements AdapterView.OnIt
             intent.putExtra("gender", gender);
             intent.putExtra("age", age);
             intent.putExtra("pBrand", pBrand);
-            intent.putExtra("cBrand", cBrand);
             startActivity(intent);
         }
     }

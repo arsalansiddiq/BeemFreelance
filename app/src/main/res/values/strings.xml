@@ -10,6 +10,8 @@
     <string name="title_activity_navigation_drawer">NavigationDrawerActivity</string>
     <string name="record_sent">Records Sent</string>
     <string name="record_pending">Records Pending</string>
+    <string name="beem_description"><![CDATA[Buisness Efficiency & Employee Management]]></string>
+    <string name="beem">BEEM</string>
 
     <string-array name="gender_array">
         <item>Select Gender</item>

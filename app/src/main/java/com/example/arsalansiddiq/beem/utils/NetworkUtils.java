@@ -134,7 +134,7 @@ public class NetworkUtils {
 
         progressDialog.show();
 
-        networkRequestInterfaces.getBrands(brandName).enqueue(new Callback<SalesObjectResponse>() {
+        networkRequestInterfaces.getBrands("Brite").enqueue(new Callback<SalesObjectResponse>() {
             @Override
             public void onResponse(Call<SalesObjectResponse> call, Response<SalesObjectResponse> response) {
                 progressDialog.cancel();
