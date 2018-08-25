@@ -12,6 +12,8 @@
     <string name="record_pending">Records Pending</string>
     <string name="beem_description"><![CDATA[Buisness Efficiency & Employee Management]]></string>
     <string name="beem">BEEM</string>
+    <string name="wrong_credentials">invalid email or password</string>
+
 
     <string-array name="gender_array">
         <item>Select Gender</item>

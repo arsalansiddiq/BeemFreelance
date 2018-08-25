@@ -2,18 +2,17 @@ package com.example.arsalansiddiq.beem.models;
 
 public class UserSelectedItems {
 
-    private int skuID, quantityLoose, quantityCarton, price, totalAmount;
+    private String name;
+    private int quantityLoose, quantityCarton;
 
-    public UserSelectedItems(int skuID, int quantityLoose, int quantityCarton, int price, int totalAmount) {
-        this.skuID = skuID;
+    public UserSelectedItems(String name, int quantityLoose, int quantityCarton) {
+        this.name = name;
         this.quantityLoose = quantityLoose;
         this.quantityCarton = quantityCarton;
-        this.price = price;
-        this.totalAmount = totalAmount;
     }
 
-    public int getSkuID() {
-        return skuID;
+    public String getName() {
+        return name;
     }
 
     public int getQuantityLoose() {
@@ -22,13 +21,5 @@ public class UserSelectedItems {
 
     public int getQuantityCarton() {
         return quantityCarton;
-    }
-
-    public int getPrice() {
-        return price;
-    }
-
-    public int getTotalAmount() {
-        return totalAmount;
     }
 }

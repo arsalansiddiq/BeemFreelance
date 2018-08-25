@@ -5,6 +5,8 @@ import com.example.arsalansiddiq.beem.models.responsemodels.AttandanceResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.LoginResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.salesresponsemodels.SalesObjectResponse;
 
+
+import io.reactivex.Observable;
 import okhttp3.MultipartBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -59,22 +61,22 @@ public interface NetworkRequestInterfaces {
     @Multipart
     @POST("sales")
     Call<LoginResponse> sendSalesDetails(@Part("cusName") String cusName, @Part("Contact") Integer contact,
-                                         @Part("email") String email, @Part("gender") String gender,
-                                         @Part("age") Integer age, @Part("cBrand") String cBrand,
-                                         @Part("pBrand") String pBrand, @Part("saleStatus") Integer saleStatus,
-                                         @Part("empId") Integer empId, @Part("empName") String empName,
-                                         @Part("designation") String designation, @Part("City") String city,
-                                         @Part("Location") Integer location);
+                                               @Part("email") String email, @Part("gender") String gender,
+                                               @Part("age") Integer age, @Part("cBrand") String cBrand,
+                                               @Part("pBrand") String pBrand, @Part("saleStatus") Integer saleStatus,
+                                               @Part("empId") Integer empId, @Part("empName") String empName,
+                                               @Part("designation") String designation, @Part("City") String city,
+                                               @Part("Location") Integer location);
 
-//    @Multipart
-//    @POST("sales")
-//    Call<LoginResponse> sendSalesDetails(@Field("cusName") String cusName, @Field("Contact") Integer contact,
-//                                         @Field("email") String email, @Field("gender") String gender,
-//                                         @Field("age") Integer age, @Field("cBrand") String cBrand,
-//                                         @Field("pBrand") String pBrand, @Field("saleStatus") Integer saleStatus,
-//                                         @Field("empId") Integer empId, @Field("empName") String empName,
-//                                         @Field("designation") String designation, @Field("City") String city,
-//                                         @Field("Location") Integer location);
+
+
+    @Multipart
+    @POST("order")
+    Observable<LoginResponse> sendOrderDetails(@Part("salesId") Integer salesId, @Part("oDate") String oDate,
+                                         @Part("brand") String brand, @Part("skuCategory") String skuCategory,
+                                         @Part("SKU") Integer SKU, @Part("saleType") Integer saleType,
+                                         @Part("noItem") Integer noItem, @Part("price") Float price,
+                                         @Part("sAmount") Float sAmount);
 
 
 }

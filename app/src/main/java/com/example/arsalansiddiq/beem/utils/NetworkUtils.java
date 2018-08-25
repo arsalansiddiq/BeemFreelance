@@ -10,6 +10,7 @@ import com.example.arsalansiddiq.beem.interfaces.AttandanceInterface;
 import com.example.arsalansiddiq.beem.interfaces.EndAttendanceInterface;
 import com.example.arsalansiddiq.beem.interfaces.LoginInterface;
 import com.example.arsalansiddiq.beem.interfaces.SKUCategoryInterface;
+import com.example.arsalansiddiq.beem.interfaces.SampleInterface;
 import com.example.arsalansiddiq.beem.models.requestmodels.LoginRequest;
 import com.example.arsalansiddiq.beem.models.responsemodels.AttandanceResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.LoginResponse;
@@ -17,6 +18,11 @@ import com.example.arsalansiddiq.beem.models.responsemodels.salesresponsemodels.
 
 import java.io.File;
 
+import io.reactivex.Observer;
+import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -154,6 +160,48 @@ public class NetworkUtils {
         });
     }
 
+
+
+//    public void sendSaleDetail(String cusName, Integer contact, String email, String gender, Integer age, String cBrand,
+//                               String pBrand, Integer saleStatus, Integer empId, String empName, String designation, String city,
+//                               Integer location, final SampleInterface loginInterface) {
+//
+//        progressDialog.show();
+//
+//        networkRequestInterfaces.sendSalesDetails(cusName, contact, email, gender, age, cBrand, pBrand, saleStatus,
+//                empId, empName, designation, city, location)
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(new Observer<LoginResponse>() {
+//                    @Override
+//                    public void onSubscribe(Disposable d) {
+//                        progressDialog.cancel();
+//                    }
+//
+//                    @Override
+//                    public void onNext(LoginResponse value) {
+//                        progressDialog.cancel();
+//                        loginInterface.success(value);
+//                        Log.i("val", String.valueOf(value));
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable e) {
+//                        progressDialog.cancel();
+//
+//                    }
+//
+//                    @Override
+//                    public void onComplete() {
+//                        progressDialog.cancel();
+//
+//                    }
+//                });
+//    }
+
+
+
+
     public void sendSaleDetail(String cusName, Integer contact, String email, String gender, Integer age, String cBrand,
                               String pBrand, Integer saleStatus, Integer empId, String empName, String designation, String city,
                               Integer location, final LoginInterface loginInterface) {
@@ -181,5 +229,69 @@ public class NetworkUtils {
             }
         });
     }
+
+
+    public void sendOrderDetail(Integer salesId, String oDate, String brand, String skuCategory, Integer SKU, Integer saleType,
+                                 Integer noItem, Float price, Float sAmount, final SampleInterface loginInterface) {
+
+                progressDialog.show();
+
+        networkRequestInterfaces.sendOrderDetails(salesId, oDate, brand, skuCategory, SKU, saleType, noItem, price,
+                sAmount)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<LoginResponse>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        progressDialog.cancel();
+                    }
+
+                    @Override
+                    public void onNext(LoginResponse value) {
+                        progressDialog.cancel();
+                        loginInterface.success(value);
+                        Log.i("val", String.valueOf(value));
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        progressDialog.cancel();
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        progressDialog.cancel();
+
+                    }
+                });
+    }
+
+//    public void sendOrderDetail(Integer salesId, String oDate, String brand, String skuCategory, Integer SKU, Integer saleType,
+//                                Integer noItem, Float price, Float sAmount, final LoginInterface loginInterface) {
+//
+//        progressDialog.show();
+//
+//        networkRequestInterfaces.sendOrderDetails(salesId, oDate, brand, skuCategory, SKU, saleType, noItem, price,
+//                sAmount).enqueue(new Callback<LoginResponse>() {
+//            @Override
+//            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+//                progressDialog.cancel();
+//                if (response.isSuccessful()) {
+//                    loginInterface.success(response);
+//                    Log.i("Sale Status", String.valueOf(response.body().getStatus()));
+//                } else {
+//                    loginInterface.failed("Something Went Worng");
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<LoginResponse> call, Throwable t) {
+//                Log.i(LOG_TAG, t.getLocalizedMessage().toString());
+//                loginInterface.failed(t.getLocalizedMessage().toString());
+//                progressDialog.cancel();
+//            }
+//        });
+//    }
 
 }

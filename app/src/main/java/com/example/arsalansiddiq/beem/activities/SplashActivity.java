@@ -1,5 +1,6 @@
 package com.example.arsalansiddiq.beem.activities;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -13,7 +14,7 @@ import com.example.arsalansiddiq.beem.R;
 import com.example.arsalansiddiq.beem.databases.BeemPreferences;
 import com.example.arsalansiddiq.beem.utils.Constants;
 
-public class SplashActivity extends AppCompatActivity {
+public class SplashActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

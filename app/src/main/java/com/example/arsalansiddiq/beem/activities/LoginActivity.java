@@ -1,15 +1,25 @@
 package com.example.arsalansiddiq.beem.activities;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.TypedValue;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import android.view.View.OnKeyListener;
 
 import com.example.arsalansiddiq.beem.R;
 import com.example.arsalansiddiq.beem.databases.BeemDatabase;
@@ -22,7 +32,7 @@ import com.example.arsalansiddiq.beem.utils.NetworkUtils;
 
 import retrofit2.Response;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends Activity {
 
     private NetworkUtils networkUtils;
     private EditText edtText_username, edtText_password;
@@ -31,8 +41,9 @@ public class LoginActivity extends AppCompatActivity {
     private Intent intent;
     private BeemDatabase beemDatabase;
     private BeemPreferences beemPreferences;
+    private TextView txtView_validationResponse, txtView_beem, txtView_descriptions;
+    private ImageView imgView_beemLogo;
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,20 +53,54 @@ public class LoginActivity extends AppCompatActivity {
         beemDatabase.getWritableDatabase();
         beemPreferences = new BeemPreferences(this);
 
-
         networkUtils = new NetworkUtils(LoginActivity.this);
 
-        edtText_username = findViewById(R.id.edtText_username);
-        edtText_password = findViewById(R.id.edtText_password);
+        edtText_username = (EditText) findViewById(R.id.edtText_username);
+        edtText_password = (EditText) findViewById(R.id.edtText_password);
+        txtView_validationResponse = findViewById(R.id.txtView_validationResponse);
+        imgView_beemLogo = findViewById(R.id.imgView_beemLogo);
+        txtView_beem = findViewById(R.id.txtView_beem);
+        txtView_descriptions = findViewById(R.id.txtView_descriptions);
         btn_login = findViewById(R.id.btn_login);
 
         username = String.valueOf(edtText_username.getText());
         password = String.valueOf(edtText_password.getText());
 
+
+        hideLogin();
+
+
+        final SharedPreferences loginStatusPreferences = getSharedPreferences(Constants.LOGIN_STATUS, MODE_PRIVATE);
+        final int status = loginStatusPreferences.getInt(Constants.KEY_LOGIN_STATUS, 0);
+
+        final Handler handler = new Handler();
+        try {
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+
+                    Intent intent = null;
+
+                    if (status == 0) {
+//                        intent = new Intent(LoginActivity.this, LoginActivity.class);
+                        viewLogin();
+                    } else if (status == 1) {
+                        intent = new Intent(LoginActivity.this, NavigationDrawerActivity.class);
+                        startActivity(intent);
+                    }
+
+                }
+            }, 2000);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
         btn_login.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
+                txtView_validationResponse.setVisibility(View.GONE);
 //                intent = new Intent(LoginActivity.this, NavigationDrawerActivity.class);
 //                startActivity(intent);
 
@@ -81,13 +126,13 @@ public class LoginActivity extends AppCompatActivity {
                                         startActivity(intent);
                                     }
                                 } else {
-                                    Toast.makeText(LoginActivity.this, "invalid credentials", Toast.LENGTH_SHORT).show();
+                                    txtView_validationResponse.setVisibility(View.VISIBLE);
                                 }
                             }
 
                             @Override
                             public void failed(String error) {
-                                Toast.makeText(LoginActivity.this, error.toString(), Toast.LENGTH_SHORT).show();
+                                txtView_validationResponse.setVisibility(View.VISIBLE);
                             }
                         });
                     } else {
@@ -96,5 +141,52 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
+
     }
+
+    void viewLogin () {
+        edtText_username.setVisibility(View.VISIBLE);
+        edtText_password.setVisibility(View.VISIBLE);
+        btn_login.setVisibility(View.VISIBLE);
+
+        imgView_beemLogo.getLayoutParams().width = dpToPx(180);
+        imgView_beemLogo.getLayoutParams().height = dpToPx(180);
+
+        // Set TextView font/text size to 25 sp
+        txtView_beem.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 30);
+
+        // Set TextView font/text size to 25 sp
+        txtView_descriptions.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
+
+//        txtView_beem.getLayoutParams().width = 150;
+//        txtView_beem.getLayoutParams().height = 150;
+//
+//        txtView_descriptions.getLayoutParams().width = 150;
+//        txtView_descriptions.getLayoutParams().height = 150;
+
+
+    }
+
+    void hideLogin () {
+
+        edtText_username.setVisibility(View.GONE);
+        edtText_password.setVisibility(View.GONE);
+        btn_login.setVisibility(View.GONE);
+
+        imgView_beemLogo.getLayoutParams().width = dpToPx(250);
+        imgView_beemLogo.getLayoutParams().height = dpToPx(250);
+
+        // Set TextView font/text size to 25 sp
+        txtView_beem.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 30);
+
+        // Set TextView font/text size to 25 sp
+        txtView_descriptions.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+    }
+
+
+    int dpToPx(int dp) {
+        float density = this.getResources().getDisplayMetrics().density;
+        return Math.round((float) dp * density);
+    }
+
 }

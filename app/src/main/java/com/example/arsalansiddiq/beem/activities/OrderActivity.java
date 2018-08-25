@@ -10,20 +10,18 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -35,19 +33,16 @@ import com.example.arsalansiddiq.beem.databases.BeemDatabase;
 import com.example.arsalansiddiq.beem.databases.BeemPreferences;
 import com.example.arsalansiddiq.beem.interfaces.LoginInterface;
 import com.example.arsalansiddiq.beem.interfaces.SKUCategoryInterface;
-import com.example.arsalansiddiq.beem.models.UserSelectedItems;
-import com.example.arsalansiddiq.beem.models.requestmodels.LoginRequest;
+import com.example.arsalansiddiq.beem.interfaces.SampleInterface;
 import com.example.arsalansiddiq.beem.models.responsemodels.LoginResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.salesresponsemodels.SalesObjectResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.salesresponsemodels.SalesSKUArrayResponse;
+import com.example.arsalansiddiq.beem.utils.AppUtils;
 import com.example.arsalansiddiq.beem.utils.Constants;
+import com.example.arsalansiddiq.beem.utils.CustomAlertDialog;
 import com.example.arsalansiddiq.beem.utils.NetworkUtils;
 
-import org.w3c.dom.Text;
-
-import java.util.ArrayList;
 import java.util.List;
-
 import retrofit2.Response;
 
 public class OrderActivity extends AppCompatActivity implements LocationListener {
@@ -73,7 +68,9 @@ public class OrderActivity extends AppCompatActivity implements LocationListener
 
     private List<SalesSKUArrayResponse> salesSKUArrayResponseArrayList = null;
 
-    private Response<SalesObjectResponse> salesObjectResponse = null;
+    CustomAlertDialog customAlertDialog;
+
+    int doubleQuantity = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,14 +80,13 @@ public class OrderActivity extends AppCompatActivity implements LocationListener
         beemDatabase = new BeemDatabase(this);
         beemDatabase.getReadableDatabase();
 
-        //view = new View(this);
-//        linearLayout_listItems = findViewById(R.id.linearLayout_listItems);
+        customAlertDialog = new CustomAlertDialog(OrderActivity.this);
+        networkUtils = new NetworkUtils(OrderActivity.this);
 
         spinner_saleStatus = findViewById(R.id.spinner_saleStatus);
         listView_order = findViewById(R.id.listView_order);
         listView_order.setDescendantFocusability(ViewGroup.FOCUS_AFTER_DESCENDANTS);
         listView_order.setItemsCanFocus(true);
-//        edtText_loose = (EditText) view.findViewById(R.id.edtText_loose);
 
         frameLayout_noProducts = findViewById(R.id.frameLayout_noProducts);
 
@@ -130,20 +126,28 @@ public class OrderActivity extends AppCompatActivity implements LocationListener
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void onSubmit(View view) {
 
-        networkUtils = new NetworkUtils(OrderActivity.this);
+        getSelectedItemAndPrice();
 
-        getLocation();
+        if (doubleQuantity > 0) {
 
-        if (spinner_saleStatus.getSelectedItemPosition() == 0) {
-
-            Toast.makeText(OrderActivity.this, "Please Select Sale Status", Toast.LENGTH_SHORT).show();
+            customAlertDialog.showDialog(false);
 
         } else {
 
-            SharedPreferences preferences = this.getSharedPreferences(Constants.BA_ATTENDANCE_ID, MODE_PRIVATE);
-            int id = preferences.getInt(Constants.KEY_BA_ATTENDANCE_ID, 0);
+            if (beemDatabase.checkUserSelectedItem()) {
 
-            LoginResponse loginResponse = beemDatabase.getUserDetail();
+                getLocation();
+
+                if (spinner_saleStatus.getSelectedItemPosition() == 0) {
+
+                    Toast.makeText(OrderActivity.this, "Please Select Sale Status", Toast.LENGTH_SHORT).show();
+
+                } else {
+
+                    SharedPreferences preferences = this.getSharedPreferences(Constants.BA_ATTENDANCE_ID, MODE_PRIVATE);
+                    int id = preferences.getInt(Constants.KEY_BA_ATTENDANCE_ID, 0);
+
+                    LoginResponse loginResponse = beemDatabase.getUserDetail();
 
                     if (networkUtils.isNetworkConnected()) {
 
@@ -157,24 +161,34 @@ public class OrderActivity extends AppCompatActivity implements LocationListener
 
                         networkUtils.sendSaleDetail(cusName, Math.toIntExact(contact), email, gender, calculatedAge, cBrand, pBrand, saleStatus,
                                 id, loginResponse.getName(), "Manager", "Karachi", (int) latitude, new LoginInterface() {
-
                                     @Override
                                     public void success(Response<LoginResponse> loginResponse) {
-
                                         if (loginResponse.body().getStatus() == 1) {
 
+//                                            sendOrder(loginResponse.body().getSales_id());
 
-                                            getSelectedItemAndPrice();
-
-//                                            final BeemPreferences beemPreferences = new BeemPreferences(OrderActivity.this);
-//                                            beemPreferences.initialize_and_createPreferences_forStatus(loginResponse.body().getStatus());
-//                                            intent = new Intent(OrderActivity.this, SalesActivity.class);
-//                                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//                                            startActivity(intent);
-//                                            Log.i("sale Statuss", String.valueOf(loginResponse.body().getStatus()));
-
+//                                            AppUtils appUtils = new AppUtils(OrderActivity.this);
+//
+//                                            networkUtils.sendOrderDetail(loginResponse.body().getSales_id(), appUtils.getDate(),
+//                                                    "Brite", "Brite", 0, 0, 0, Float.valueOf(0),
+//                                                    beemDatabase.getTotalAmount(), new SampleInterface() {
+//
+//                                                        @Override
+//                                                        public void success(LoginResponse loginResponse) {
+//                                                            final BeemPreferences beemPreferences = new BeemPreferences(OrderActivity.this);
+//                                                            beemPreferences.initialize_and_createPreferences_forStatus(loginResponse.getStatus());
+//                                                            intent = new Intent(OrderActivity.this, SalesActivity.class);
+//                                                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                                                            startActivity(intent);
+//                                                            Log.i("order Statuss", String.valueOf(loginResponse.getOrder_id()));
+//                                                        }
+//
+//                                                        @Override
+//                                                        public void failed(String error) {
+//
+//                                                        }
+//                                                    });
                                         }
-
                                     }
 
                                     @Override
@@ -183,9 +197,63 @@ public class OrderActivity extends AppCompatActivity implements LocationListener
                                     }
                                 });
                     }
-                    }
+                }
+            } else {
+                customAlertDialog.showDialog(true);
+            }
+        }
+
+
     }
 
+
+//    void sendOrder(final int sales_id) {
+//
+//
+//
+////        final Handler handler = new Handler();
+////        try {
+////            handler.postDelayed(new Runnable() {
+////                @Override
+////                public void run() {
+//
+////                    Thread thread = new Thread(new Runnable(){
+////                        @Override
+////                        public void run(){
+//
+//                            AppUtils appUtils = new AppUtils(OrderActivity.this);
+//                            networkUtils.sendOrderDetail(sales_id, "sdfsd",
+//                                    "Brite", "Brite", 0, 0, 0, Float.valueOf(0),
+//                                    Float.valueOf(0), new SampleInterface() {
+//
+//                                        @Override
+//                                        public void success(LoginResponse loginResponse) {
+//                                            final BeemPreferences beemPreferences = new BeemPreferences(OrderActivity.this);
+//                                            beemPreferences.initialize_and_createPreferences_forStatus(loginResponse.getStatus());
+//                                            intent = new Intent(OrderActivity.this, SalesActivity.class);
+//                                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                                            startActivity(intent);
+//                                            Log.i("order Statuss", String.valueOf(loginResponse.getOrder_id()));
+//
+//                                        }
+//
+//                                        @Override
+//                                        public void failed(String error) {
+//
+//                                        }
+//                                    });
+////                        }
+////                    });
+////                    thread.start();
+//
+//
+////                }
+////            }, 2000);
+////        } catch (Exception e) {
+////            e.printStackTrace();
+////        }
+//
+//    }
 
     @Override
     public void onLocationChanged(Location location) {
@@ -239,7 +307,6 @@ public class OrderActivity extends AppCompatActivity implements LocationListener
         return false;
     }
 
-
     private void getBrandItems() {
 
 
@@ -279,60 +346,66 @@ public class OrderActivity extends AppCompatActivity implements LocationListener
 
     void getSelectedItemAndPrice() {
 
+        beemDatabase.removeSelectedItemTableRaws();
+
         int listLength = listView_order.getChildCount();
-        String[] valueOfEditText = new String[listLength];
 
-        for (int i = 0; i < listLength; i++) {
+        int looseItem, cartonItem;
 
-            view = listView_order.getChildAt(i);
+        if  (listLength > 0) {
 
-            txtView_name = (TextView) view.findViewById(R.id.txtView_name);
+            for (int i = 0; i < listLength; i++) {
 
-            edtText_loose = (EditText) view.findViewById(R.id.edtText_loose);
-            edtText_carton = (EditText) view.findViewById(R.id.edtText_carton);
+                doubleQuantity = 0;
 
-            if (TextUtils.isEmpty(edtText_loose.getText().toString()) && TextUtils.isEmpty(edtText_carton.getText().toString())) {
+                looseItem = 0; cartonItem = 0;
 
-            } else if (edtText_loose.getText().toString() == "0" && edtText_carton.getText().toString() == "0") {
-            } else if (edtText_loose.getText().toString().length() > 0 && edtText_carton.getText().toString() == "" ||
-                    edtText_loose.getText().toString() == "" && edtText_carton.getText().length() > 0) {
-                valueOfEditText[i] = "" + i;
+                view = listView_order.getChildAt(i);
+
+                txtView_name = (TextView) view.findViewById(R.id.txtView_name);
+
+                edtText_loose = (EditText) view.findViewById(R.id.edtText_loose);
+                edtText_carton = (EditText) view.findViewById(R.id.edtText_carton);
+
+                String looseText = edtText_loose.getText().toString().trim();
+                String cartonText = edtText_carton.getText().toString().trim();
+
+                if (looseText.equals("")  &&
+                        cartonText.equals("")) {
+                } else if (looseText.length() > 0 &&
+                        cartonText.length() > 0){
+                    doubleQuantity += 1;
+                    return;
+                } else if (looseText.length() > 0 &&
+                        cartonText.equals("")){
+                    looseItem = Integer.parseInt(looseText);
+                } else if (looseText.equals("") &&
+                        cartonText.length() > 0){
+                    cartonItem = Integer.parseInt(cartonText);
+                }
+
+                SalesSKUArrayResponse salesSKUArrayResponse = salesSKUArrayResponseArrayList.get(i);
+
+                     if (looseItem != 0 || cartonItem != 0) {
+
+                         float totalAmount = cartonItem * 10 * salesSKUArrayResponse.getPrice();
+
+                        beemDatabase.insertSelectItemDetail(salesSKUArrayResponse.getName(), looseItem, cartonItem, totalAmount);
+                    }
+
             }
+        } else {
+
+            listView_order.setVisibility(View.GONE);
+            frameLayout_noProducts.setVisibility(View.VISIBLE);
 
         }
-
-//        if (TextUtils.isEmpty(edtText_loose.getText().toString()) && TextUtils.isEmpty(edtText_carton.getText().toString())) {
-//
-//            Log.i("quantityEmpty", "empty");
-//            Toast.makeText(this, "please enter quantity", Toast.LENGTH_SHORT).show();
-//
-//        } else {
-//
-//            if (edtText_loose.getText().toString() == "0" && edtText_carton.getText().toString() == "0") {
-//                Toast.makeText(this, "Please Enter Quantity", Toast.LENGTH_SHORT).show();
-//            } else if (edtText_loose.getText().toString().length() > 0 && edtText_carton.getText().toString() == "") {
-//                loose = Integer.parseInt(edtText_loose.getText().toString());
-//                getCalculatedValues(i, loose, 0);
-//            } else if (edtText_loose.getText().toString() == "" && edtText_carton.getText().toString().length() > 0) {
-//                carton = Integer.parseInt(edtText_carton.getText().toString());
-//                getCalculatedValues(i, 0, carton);
-//            } else if (edtText_loose.getText().toString() == "" && edtText_carton.getText().toString() == "") {
-//                Toast.makeText(this, "Please Enter Quantity", Toast.LENGTH_SHORT).show();
-//            } else if (edtText_loose.getText().toString().length() > 0 && edtText_carton.getText().toString().length() > 0) {
-//                Toast.makeText(this, "Please One Category Loose or Carton", Toast.LENGTH_SHORT).show();
-//            }
-//        }
-
-//            Log.i("detLoose", valueOfEditText[i]);
 
     }
 
     private void getCalculatedValues(int i, int loose, int carton) {
 
-
         SalesSKUArrayResponse salesSKUArrayResponse = salesSKUArrayResponseArrayList.get(i);
-
-        //int price = salesSKUArrayResponse.getPrice();
 
         float pricePerItem = (salesSKUArrayResponse.getPrice() / salesSKUArrayResponse.getItemPerCarton());
 

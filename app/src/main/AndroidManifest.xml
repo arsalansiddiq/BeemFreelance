@@ -16,7 +16,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true">
         <activity android:theme="@style/AppTheme"
-            android:name=".activities.SplashActivity">
+            android:name=".activities.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -37,8 +37,8 @@
             android:name=".activities.OrderActivity"
             android:windowSoftInputMode="adjustPan"/>
 
-        <activity android:theme="@style/AppTheme2"
-            android:name=".activities.LoginActivity"/>
+        <!--<activity android:theme="@style/AppTheme"-->
+            <!--android:name=".activities.LoginActivity"/>-->
     </application>
 
 </manifest>

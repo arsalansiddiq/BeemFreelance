@@ -20,7 +20,7 @@
         android:id="@+id/imgView_beemLogo"
         android:layout_width="150dp"
         android:layout_height="150dp"
-        android:layout_margin="10dp"
+        android:layout_margin="5dp"
         android:src="@mipmap/beemlogo"/>
 
     <TextView
@@ -29,15 +29,15 @@
         android:layout_height="wrap_content"
         android:text="@string/beem"
         android:textSize="30dp"
-        android:layout_margin="10dp"
+        android:layout_margin="5dp"
         android:textAlignment="center" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/beem_description"
-        android:textSize="18dp"
-        android:layout_margin="10dp"
+        android:textSize="16dp"
+        android:layout_margin="5dp"
         android:textAlignment="center" />
 
     </LinearLayout>

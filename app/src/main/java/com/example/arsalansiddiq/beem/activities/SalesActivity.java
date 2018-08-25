@@ -2,6 +2,7 @@ package com.example.arsalansiddiq.beem.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -22,6 +23,9 @@ import com.example.arsalansiddiq.beem.models.responsemodels.salesresponsemodels.
 import com.example.arsalansiddiq.beem.models.responsemodels.salesresponsemodels.SalesSKUArrayResponse;
 import com.example.arsalansiddiq.beem.utils.Constants;
 import com.example.arsalansiddiq.beem.utils.NetworkUtils;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import retrofit2.Response;
 
@@ -138,19 +142,13 @@ public class SalesActivity extends AppCompatActivity implements AdapterView.OnIt
 
     public void onNext(View v) {
 
+
+
         name = edtText_name.getText().toString();
+        edtText_email.setTextColor(Color.parseColor("#000000"));
+        edtText_contact.setTextColor(Color.parseColor("#000000"));
 
-        if (TextUtils.isEmpty(edtText_contact.getText())){
-            Toast.makeText(this, "Please insert your number", Toast.LENGTH_SHORT).show();
-        } else {
-            contact = Long.valueOf(edtText_contact.getText().toString());
-        }
-
-        Log.i("number", String.valueOf(contact));
-        email = edtText_email.getText().toString();
-
-        if (TextUtils.isEmpty(name) || TextUtils.isEmpty(email) ||
-                spinner_gender.getSelectedItemPosition() == 0
+        if (TextUtils.isEmpty(name) || spinner_gender.getSelectedItemPosition() == 0
                 || spinner_age.getSelectedItemPosition() == 0 ||spinner_pBrand.getSelectedItemPosition() == 0
                 || spinner_cBrand.getSelectedItemPosition() == 0) {
 
@@ -158,14 +156,53 @@ public class SalesActivity extends AppCompatActivity implements AdapterView.OnIt
 
         } else {
 
-            Intent intent = new Intent(SalesActivity.this, OrderActivity.class);
-            intent.putExtra("name", name);
-            intent.putExtra("contact", contact);
-            intent.putExtra("email", email);
-            intent.putExtra("gender", gender);
-            intent.putExtra("age", age);
-            intent.putExtra("pBrand", pBrand);
-            startActivity(intent);
+            if (TextUtils.isEmpty(edtText_email.getText().toString()) && TextUtils.isEmpty(edtText_contact.getText().toString())) {
+
+                Intent intent = new Intent(SalesActivity.this, OrderActivity.class);
+                intent.putExtra("name", name);
+                intent.putExtra("contact", 0);
+                intent.putExtra("email", "");
+                intent.putExtra("gender", gender);
+                intent.putExtra("age", age);
+                intent.putExtra("pBrand", pBrand);
+                startActivity(intent);
+
+            } else {
+                if (TextUtils.isEmpty(edtText_email.getText().toString())) {
+                    email = "";
+                } else {
+                    if (isEmailValid(edtText_email.getText().toString())) {
+                        email = edtText_email.getText().toString();
+                    } else {
+                        edtText_email.setTextColor(Color.parseColor("#ff0000"));
+                        Toast.makeText(this, " please enter valid crendentials", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                if (TextUtils.isEmpty(edtText_contact.getText().toString())) {
+                    contact = Long.valueOf(0);
+                } else {
+                    if (edtText_contact.getText().length() != 11) {
+                        edtText_contact.setTextColor(Color.parseColor("#ff0000"));
+                    } else {
+                        contact = Long.valueOf(edtText_contact.getText().toString());
+                    }
+                }
+
+                if (isEmailValid(edtText_email.getText().toString()) && edtText_contact.getText().toString().length() == 11) {
+                    Intent intent = new Intent(SalesActivity.this, OrderActivity.class);
+                    intent.putExtra("name", name);
+                    intent.putExtra("contact", contact);
+                    intent.putExtra("email", email);
+                    intent.putExtra("gender", gender);
+                    intent.putExtra("age", age);
+                    intent.putExtra("pBrand", pBrand);
+                    startActivity(intent);
+                }
+            }
+
+
+
         }
     }
 
@@ -225,5 +262,25 @@ public class SalesActivity extends AppCompatActivity implements AdapterView.OnIt
     }
 
 
+    public boolean isEmailValid(String email)
+    {
+        String regExpn =
+                "^(([\\w-]+\\.)+[\\w-]+|([a-zA-Z]{1}|[\\w-]{2,}))@"
+                        +"((([0-1]?[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\.([0-1]?"
+                        +"[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\."
+                        +"([0-1]?[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\.([0-1]?"
+                        +"[0-9]{1,2}|25[0-5]|2[0-4][0-9])){1}|"
+                        +"([a-zA-Z]+[\\w-]+\\.)+[a-zA-Z]{2,4})$";
+
+        CharSequence inputStr = email;
+
+        Pattern pattern = Pattern.compile(regExpn,Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(inputStr);
+
+        if(matcher.matches())
+            return true;
+        else
+            return false;
+    }
 
 }

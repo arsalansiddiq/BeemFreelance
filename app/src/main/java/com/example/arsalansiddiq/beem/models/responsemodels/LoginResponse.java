@@ -20,7 +20,11 @@ public class LoginResponse {
 
     @SerializedName("sales_id")
     @Expose
-    private String sales_id;
+    private Integer sales_id;
+
+    @SerializedName("order_id")
+    @Expose
+    private String order_id;
 
     public Integer getStatus() {
         return status;
@@ -54,11 +58,19 @@ public class LoginResponse {
         this.brand = brand;
     }
 
-    public String getSales_id() {
+    public Integer getSales_id() {
         return sales_id;
     }
 
-    public void setSales_id(String sales_id) {
+    public void setSales_id(Integer sales_id) {
         this.sales_id = sales_id;
+    }
+
+    public String getOrder_id() {
+        return order_id;
+    }
+
+    public void setOrder_id(String order_id) {
+        this.order_id = order_id;
     }
 }

@@ -15,7 +15,7 @@ import com.example.arsalansiddiq.beem.models.responsemodels.LoginResponse;
 
 public class BeemDatabase extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     // Database Name
     private static final String DATABASE_NAME = "beem.db";
@@ -24,6 +24,7 @@ public class BeemDatabase extends SQLiteOpenHelper {
     private static final String TABLE_LOGIN = "user_info";
     public static String TABLE_USER_LOCATION = "ba_location_table";
     public static String TABLE_BA_ATTENDANCE = "ba_attendance_table";
+    public static String TABLE_ORDER_QUANTITY = "quantity_table";
 
     // user_info Columns names
     private static final String KEY_USER_ID = "user_id";
@@ -34,6 +35,12 @@ public class BeemDatabase extends SQLiteOpenHelper {
     private static final String KEY_LOCATION_ID = "location_ids";
     private static final String KEY_PERIMETER_LATITUDE = "latitude";
     private static final String KEY_PERIMETER_LONGITUDE = "longitude";
+
+    //Quantity Table Columns Names
+    private static final String KEY_PRODUCT_NAME = "name";
+    private static final String KEY_LOOSE_QUANTITY = "loose";
+    private static final String KEY_CARTON_QUANTITY = "carton";
+    private static final String KEY_PRICE_PER_PIECE= "price";
 
     //TABLE_BA_ATTENDANCE Columns Names
     private static final String KEY_BA_ATTENDANCE_ID = "ba_attendance_ids";
@@ -59,6 +66,10 @@ public class BeemDatabase extends SQLiteOpenHelper {
             + KEY_START_ATTENDANCE_LONGITUDE + " float, " + KEY_END_ATTENDANCE_LATITUDE + " float, " +
             KEY_END_ATTENDANCE_LONGITUDE + " float, " + KEY_BA_ATTENDANCE_STATUS + " float);";
 
+
+    private final String quantityTable = "create table " + TABLE_ORDER_QUANTITY + " (" + KEY_PRODUCT_NAME + " TEXT PRIMARY KEY, " + KEY_LOOSE_QUANTITY +
+            " INTEGER, " + KEY_CARTON_QUANTITY + " INTEGER, " + KEY_PRICE_PER_PIECE + " float);";
+
     public BeemDatabase(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -72,6 +83,9 @@ public class BeemDatabase extends SQLiteOpenHelper {
 
         sqLiteDatabase.execSQL(perimeterTable);
 
+        sqLiteDatabase.execSQL(quantityTable);
+
+
 //        sqLiteDatabase.execSQL(attendanceTable);
 
     }
@@ -82,6 +96,10 @@ public class BeemDatabase extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_LOGIN);
 
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_USER_LOCATION);
+
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_ORDER_QUANTITY);
+
+
 //        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_BA_ATTENDANCE);
 
         onCreate(sqLiteDatabase);
@@ -103,6 +121,51 @@ public class BeemDatabase extends SQLiteOpenHelper {
 
 //        Log.i("ID and Number Added: ", String.valueOf(check));
         db.close();
+    }
+
+
+    public void insertSelectItemDetail(String name, int loose, int carton, float price) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+//        DBModel dbModel = new DBModel(id, number,devId);
+//
+        ContentValues values = new ContentValues();
+        values.put(KEY_PRODUCT_NAME, name);
+        values.put(KEY_LOOSE_QUANTITY, loose);
+        values.put(KEY_CARTON_QUANTITY, carton);
+        values.put(KEY_PRICE_PER_PIECE, price);
+
+        // Inserting Row
+        long check = db.insert(TABLE_ORDER_QUANTITY, null, values);
+
+        Log.i("Quantity Table: ", String.valueOf(check));
+        db.close();
+    }
+
+    public boolean checkUserSelectedItem() {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        String countQuery = "select * from " + TABLE_ORDER_QUANTITY;
+        Cursor cursor = db.rawQuery(countQuery, null);
+
+        Log.i("DB GETCOUNT", String.valueOf(cursor.getCount()));
+
+        if (cursor.getCount() == 0) {
+            cursor.close();
+            return false;
+        } else {
+            cursor.close();
+            return true;
+        }
+
+    }
+
+    public void removeSelectedItemTableRaws() {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        String deleteQuery = "delete from "+ TABLE_ORDER_QUANTITY;
+        db.execSQL(deleteQuery);
+
     }
 
     public void insertBA_AttendanceInfo(int id, String date, String name, String startTime,
@@ -162,6 +225,23 @@ public class BeemDatabase extends SQLiteOpenHelper {
 
 
 
+    public float getTotalAmount() {
+
+        float amount = 0;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("select * from " + TABLE_ORDER_QUANTITY, null);
+
+        if (cursor.moveToFirst()) {
+            while (!cursor.isAfterLast()) {
+
+                amount += cursor.getInt(cursor.getColumnIndex(KEY_PRICE_PER_PIECE));
+            }
+        }
+
+        Log.i("amount", String.valueOf(amount));
+        return amount;
+    }
 
 
 //

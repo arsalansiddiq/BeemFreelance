@@ -2,12 +2,12 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
     tools:context=".activities.SalesActivity">
 
     <LinearLayout
-        android:layout_marginTop="15dp"
         android:id="@+id/linear"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -81,18 +81,11 @@
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
                 android:layout_weight="1"
+                android:inputType="textPersonName"
                 android:textSize="20sp"
                 android:layout_margin="5dp"
                 android:hint="Name"/>
-            <EditText
-                android:id="@+id/edtText_cotact"
-                android:layout_height="wrap_content"
-                android:layout_width="match_parent"
-                android:inputType="number"
-                android:layout_weight="1"
-                android:textSize="20sp"
-                android:layout_margin="5dp"
-                android:hint="Contact No"/>
+
             <EditText
                 android:id="@+id/edtText_email"
                 android:layout_height="wrap_content"
@@ -103,6 +96,16 @@
                 android:textSize="20sp"
                 android:hint="Email"/>
 
+            <EditText
+                android:id="@+id/edtText_cotact"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_weight="1"
+                android:inputType="number"
+                android:textSize="20sp"
+                android:layout_margin="5dp"
+                android:hint="Contact No"/>
+
         </LinearLayout>
 
         <LinearLayout
@@ -112,7 +115,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_weight="1"
-            android:layout_marginTop="10dp">
+            android:layout_marginTop="20dp">
 
             <TextView
                 android:id="@+id/txtView_gender"
@@ -213,9 +216,8 @@
         android:layout_below="@+id/linear"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
-        android:layout_weight="1"
-        android:layout_marginTop="40dp"
         android:layout_centerInParent="true"
+        android:layout_marginTop="25dp"
         android:id="@+id/btn_next"
         android:onClick="onNext"
         android:textSize="18dp"
