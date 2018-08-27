@@ -202,9 +202,9 @@ public class NetworkUtils {
 
 
 
-    public void sendSaleDetail(String cusName, Integer contact, String email, String gender, Integer age, String cBrand,
-                              String pBrand, Integer saleStatus, Integer empId, String empName, String designation, String city,
-                              Integer location, final LoginInterface loginInterface) {
+    public void sendSaleDetail(String cusName, Long contact, String email, String gender, Integer age, String cBrand,
+                               String pBrand, Integer saleStatus, Integer empId, String empName, String designation, String city,
+                               Integer location, final LoginInterface loginInterface) {
 
         progressDialog.show();
 
@@ -231,8 +231,8 @@ public class NetworkUtils {
     }
 
 
-    public void sendOrderDetail(Integer salesId, String oDate, String brand, String skuCategory, Integer SKU, Integer saleType,
-                                 Integer noItem, Float price, Float sAmount, final SampleInterface loginInterface) {
+    public void sendOrderDetail(Integer salesId, String oDate, String brand, String skuCategory, String SKU, String saleType,
+                                 Integer noItem, Integer price, Integer sAmount, final SampleInterface loginInterface) {
 
                 progressDialog.show();
 

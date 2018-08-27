@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 
 import com.example.arsalansiddiq.beem.R;
-import com.example.arsalansiddiq.beem.activities.OrderActivity;
+//import com.example.arsalansiddiq.beem.activities.OrderActivity;
 
 public class CustomAlertDialog {
 

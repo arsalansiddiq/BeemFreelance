@@ -34,7 +34,7 @@
             android:name=".activities.SalesActivity" />
         <activity
             android:theme="@style/AppTheme"
-            android:name=".activities.OrderActivity"
+            android:name=".MainActivity"
             android:windowSoftInputMode="adjustPan"/>
 
         <!--<activity android:theme="@style/AppTheme"-->

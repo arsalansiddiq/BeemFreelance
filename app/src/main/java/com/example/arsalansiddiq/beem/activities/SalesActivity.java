@@ -17,6 +17,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.arsalansiddiq.beem.MainActivity;
 import com.example.arsalansiddiq.beem.R;
 import com.example.arsalansiddiq.beem.interfaces.SKUCategoryInterface;
 import com.example.arsalansiddiq.beem.models.responsemodels.salesresponsemodels.SalesObjectResponse;
@@ -158,7 +159,7 @@ public class SalesActivity extends AppCompatActivity implements AdapterView.OnIt
 
             if (TextUtils.isEmpty(edtText_email.getText().toString()) && TextUtils.isEmpty(edtText_contact.getText().toString())) {
 
-                Intent intent = new Intent(SalesActivity.this, OrderActivity.class);
+                Intent intent = new Intent(SalesActivity.this, MainActivity.class);
                 intent.putExtra("name", name);
                 intent.putExtra("contact", 0);
                 intent.putExtra("email", "");
@@ -190,7 +191,7 @@ public class SalesActivity extends AppCompatActivity implements AdapterView.OnIt
                 }
 
                 if (isEmailValid(edtText_email.getText().toString()) && edtText_contact.getText().toString().length() == 11) {
-                    Intent intent = new Intent(SalesActivity.this, OrderActivity.class);
+                    Intent intent = new Intent(SalesActivity.this, MainActivity.class);
                     intent.putExtra("name", name);
                     intent.putExtra("contact", contact);
                     intent.putExtra("email", email);

@@ -24,6 +24,13 @@
         android:layout_margin="10dp"
         android:layout_below="@+id/txtView_salesStatus" />
 
+    <LinearLayout
+        android:id="@+id/linearLayout_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:orientation="vertical">
+
     <ListView
         android:layout_below="@+id/spinner_saleStatus"
         android:layout_margin="10dp"
@@ -55,5 +62,7 @@
         android:layout_gravity="bottom|center"
         android:onClick="onSubmit"
         android:text="Submit" />
+
+    </LinearLayout>
 
 </LinearLayout>

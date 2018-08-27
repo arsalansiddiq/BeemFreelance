@@ -60,7 +60,7 @@ public interface NetworkRequestInterfaces {
 
     @Multipart
     @POST("sales")
-    Call<LoginResponse> sendSalesDetails(@Part("cusName") String cusName, @Part("Contact") Integer contact,
+    Call<LoginResponse> sendSalesDetails(@Part("cusName") String cusName, @Part("Contact") Long contact,
                                                @Part("email") String email, @Part("gender") String gender,
                                                @Part("age") Integer age, @Part("cBrand") String cBrand,
                                                @Part("pBrand") String pBrand, @Part("saleStatus") Integer saleStatus,
@@ -74,9 +74,9 @@ public interface NetworkRequestInterfaces {
     @POST("order")
     Observable<LoginResponse> sendOrderDetails(@Part("salesId") Integer salesId, @Part("oDate") String oDate,
                                          @Part("brand") String brand, @Part("skuCategory") String skuCategory,
-                                         @Part("SKU") Integer SKU, @Part("saleType") Integer saleType,
-                                         @Part("noItem") Integer noItem, @Part("price") Float price,
-                                         @Part("sAmount") Float sAmount);
+                                         @Part("SKU") String SKU, @Part("saleType") String saleType,
+                                         @Part("noItem") Integer noItem, @Part("price") Integer price,
+                                         @Part("sAmount") Integer sAmount);
 
 
 }
